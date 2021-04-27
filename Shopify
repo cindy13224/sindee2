@@ -31,7 +31,7 @@ dt2 <- aggregate(dt[, 4], list(dt$shop_id), mean)
 names(dt2)[1] <- "shop_id"
 names(dt2)[2] <- "AOV"
 dt2
-# Key findings: shop_id 42 and 78 have drastically higher AOV.
+# findings: shop_id 42 and 78 have drastically higher AOV.
 
 
 # Check whether or not the weeks have an effect on AOV
@@ -65,7 +65,7 @@ plot2 <- ggplot(PlotData1, aes(x=factor(created_at), y = yearlyAverage)) +
     x = "Week",
     y = "Average Order Value") 
 plot2
-# Key findings: Week 11 in 2017 had the highest AOV
+# findings: Week 11 in 2017 had the highest AOV
 
 
 # We can also look at total items purchased per shop_id
@@ -73,7 +73,7 @@ dt4 <- aggregate(dt[, 5], list(dt$shop_id), mean)
 names(dt4)[1] <- "shop_id"
 names(dt4)[2] <- "average_total_items"
 dt4
-# Key findings: Store 42 has an average of 667 items purchased per transaction
+# findings: Store 42 has an average of 667 items purchased per transaction
 # which is way above average.
 
 # ANSWER
