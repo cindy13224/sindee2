@@ -1,0 +1,92 @@
+dt <- read.csv("/Users/cindy/Downloads/Shopify.csv")
+AOV <- mean(dt$order_amount)
+
+# QUESTIONS
+# 1. Think about what could be going wrong with our calculation. 
+# Think about a better way to evaluate this data. 
+# 2. What metric would you report for this dataset?
+# 3. What is its value?
+
+# First I'll convert variables into factors and dates
+dt$created_at <- as.POSIXct(dt$created_at, "%m/%d/%Y %H:%M:%S")    
+dt$payment_method <- as.factor(dt$payment_method)
+
+# Then I'll look at the summary statistics for the dataset
+summary(dt) #See that there are outliers in order_amount and total_items
+# This can indicate that the AOV is higher than expected because of some
+# extreme values
+boxplot(dt$order_amount) # Viewing outliers
+boxplot(dt$total_items) # Viewing outliers
+
+
+# Another way to evaluate the data would be to split up the order_amounts by shop_id
+# Check AOV per shop_id
+dt1<- subset(dt, shop_id %in% 1)
+AOV_Shop1 <- mean(dt1$order_amount)
+#See that shop 1 has a much lower mean
+
+
+# Apply for all shops
+dt2 <- aggregate(dt[, 4], list(dt$shop_id), mean)
+names(dt2)[1] <- "shop_id"
+names(dt2)[2] <- "AOV"
+dt2
+# Key findings: shop_id 42 and 78 have drastically higher AOV.
+
+
+# Check whether or not the weeks have an effect on AOV
+dt3 <- dt
+dt3$created_at <- format(dt3$created_at, '%Y-%U')
+
+PlotData = dt3 %>% group_by(created_at) %>%
+  summarise(yearlyAverage = mean(order_amount))
+
+plot1 <- ggplot(PlotData, aes(x=factor(created_at), y = yearlyAverage)) +
+  geom_point(alpha=0.6, size=2)+
+  labs(
+    title = "Weekly Average Order Value",
+    x = "Week",
+    y = "Average Order Value") 
+plot1
+# Key findings: Week 10 in 2017 saw a drastically lower AOV.
+# However this plot is skewed because of the few extreme values
+# We can take a look at the weekly average AOV without shops 42 and 78
+
+newdata <- dt[ !(dt$shop_id %in% c(42, 78)), ]
+newdata$created_at <- format(newdata$created_at, '%Y-%U')
+
+PlotData1 = newdata %>% group_by(created_at) %>%
+  summarise(yearlyAverage = mean(order_amount))
+
+plot2 <- ggplot(PlotData1, aes(x=factor(created_at), y = yearlyAverage)) +
+  geom_point(alpha=0.6, size=2)+
+  labs(
+    title = "Weekly Average Order Value",
+    x = "Week",
+    y = "Average Order Value") 
+plot2
+# Key findings: Week 11 in 2017 had the highest AOV
+
+
+# We can also look at total items purchased per shop_id
+dt4 <- aggregate(dt[, 5], list(dt$shop_id), mean)
+names(dt4)[1] <- "shop_id"
+names(dt4)[2] <- "average_total_items"
+dt4
+# Key findings: Store 42 has an average of 667 items purchased per transaction
+# which is way above average.
+
+# ANSWER
+# 1. Think about what could be going wrong with our calculation. 
+# -> extreme values are skewing the AOV
+# Think about a better way to evaluate this data. 
+# -> look at AOV based on shop_id
+# -> look at AOV based on the week ending
+# What metric would you report for this dataset?
+# -> a metric that tells us the order_amount per shop_id, the total_items per
+# shop_id, and the average weekly AOV
+# What is its value?
+# -> dt2 is the average order amount per shop id
+# -> dt4 is the average item ordered per shop id
+# -> plot1 shows the AOV per week. However plot1 may be skewed because of the extreme values
+# -> plot 2 shows the AOV per week excluding purchases from stores 42 and 78
