@@ -82,6 +82,7 @@ dt4
 # Think about a better way to evaluate this data. 
 # -> look at AOV based on shop_id
 # -> look at AOV based on the week ending
+# -> look at standard deviation
 # What metric would you report for this dataset?
 # -> a metric that tells us the order_amount per shop_id, the total_items per
 # shop_id, and the average weekly AOV
